@@ -3,8 +3,8 @@ description: 'Generate a comprehensive summary of the commit stage results inclu
 author: 'Optivem'
 
 inputs:
-  build-result:
-    description: 'Result of the build job (success, failure, cancelled, etc.)'
+  stage-result:
+    description: 'Result of the stage job (success, failure, cancelled, etc.)'
     required: true
   image-url:
     description: 'Full URL of the pushed Docker image'
@@ -49,7 +49,7 @@ runs:
         echo "" >> $GITHUB_STEP_SUMMARY
         
         # Check build job result
-        BUILD_RESULT="${{ inputs.build-result }}"
+        BUILD_RESULT="${{ inputs.stage-result }}"
         
         if [[ "$BUILD_RESULT" == "success" ]]; then
           echo "## ${{ inputs.success-emoji }} ${{ inputs.stage-name }} Succeeded" >> $GITHUB_STEP_SUMMARY
