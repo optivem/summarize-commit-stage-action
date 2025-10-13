@@ -101,9 +101,9 @@ This action generates a formatted summary that includes:
 - **Stage Status**: Clear indication of success/failure
 - **Component Information**: The component name being processed
 - **Artifact Details**:
+  - Artifact type for context
   - Artifact URL for easy access
   - Creation timestamp
-  - Artifact type for context
 
 ## Example Output
 
@@ -113,6 +113,9 @@ When successful, the action generates a summary like:
 ✅ API Build & Deploy - Backend API
 
 Successfully Published Docker Image:
+
+**Artifact Type:**
+`Docker Image`
 
 **Artifact URL:**
 `my-registry.com/my-app:latest`
