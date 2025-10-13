@@ -38,9 +38,9 @@ jobs:
         with:
           stage-result: ${{ job.status }}
           component-name: 'My Application'
-          image-url: ${{ steps.docker-build.outputs.image-url }}
+          image-latest-url: ${{ steps.docker-build.outputs.image-url }}
           image-digest-url: ${{ steps.docker-build.outputs.image-digest-url }}
-          image-created: ${{ steps.docker-build.outputs.image-created }}
+          image-created-timestamp: ${{ steps.docker-build.outputs.image-created }}
 ```
 
 ### Advanced Example with Custom Stage Name
@@ -52,9 +52,9 @@ jobs:
           stage-result: ${{ job.status }}
           stage-name: 'API Build & Deploy'
           component-name: 'Backend API'
-          image-url: 'my-registry.com/my-app:latest'
+          image-latest-url: 'my-registry.com/my-app:latest'
           image-digest-url: 'my-registry.com/my-app@sha256:abc123...'
-          image-created: '2025-10-13T10:30:00Z'
+          image-created-timestamp: '2025-10-13T10:30:00Z'
 ```
 
 ## Inputs
@@ -64,9 +64,9 @@ jobs:
 | `stage-result` | Result of the stage job (success, failure, cancelled, etc.) | ✅ Yes | |
 | `stage-name` | Name of the stage being summarized | ❌ No | `Commit Stage` |
 | `component-name` | Name of the component being processed (e.g., Monolith, API, Frontend) | ✅ Yes | |
-| `image-url` | Full URL of the pushed Docker image | ✅ Yes | |
+| `image-latest-url` | Full URL of the pushed Docker image | ✅ Yes | |
 | `image-digest-url` | Full URL with SHA256 digest of the pushed image | ✅ Yes | |
-| `image-created` | Timestamp when the Docker image was created (ISO 8601 format) | ✅ Yes | |
+| `image-created-timestamp` | Timestamp when the Docker image was created (ISO 8601 format) | ✅ Yes | |
 
 ## Output
 

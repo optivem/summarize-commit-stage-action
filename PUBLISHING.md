@@ -64,9 +64,9 @@ git push origin main
      with:
        stage-result: ${{ job.status }}
        component-name: 'My Component'
-       image-url: ${{ steps.build.outputs.image-url }}
+       image-latest-url: ${{ steps.build.outputs.image-url }}
        image-digest-url: ${{ steps.build.outputs.image-digest-url }}
-       image-created: ${{ steps.build.outputs.image-created }}
+       image-created-timestamp: ${{ steps.build.outputs.image-created }}
    ```
    
    For detailed documentation, see the [README](https://github.com/optivem/summarize-commit-stage-action#readme).

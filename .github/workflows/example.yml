@@ -53,9 +53,9 @@ jobs:
         with:
           stage-result: ${{ job.status }}
           component-name: 'Example Application'
-          image-url: ${{ fromJSON(steps.docker-build.outputs.metadata)['image.name'] }}
+          image-latest-url: ${{ fromJSON(steps.docker-build.outputs.metadata)['image.name'] }}
           image-digest-url: ${{ steps.meta.outputs.tags }}@${{ steps.docker-build.outputs.digest }}
-          image-created: ${{ fromJSON(steps.docker-build.outputs.metadata)['image.created'] }}
+          image-created-timestamp: ${{ fromJSON(steps.docker-build.outputs.metadata)['image.created'] }}
 
   multi-component-example:
     runs-on: ubuntu-latest
@@ -74,9 +74,9 @@ jobs:
           echo "Building ${{ matrix.component }}"
           
           # Mock outputs that would come from actual build steps
-          echo "image-url=ghcr.io/example/my-app-${{ matrix.component }}:latest" >> $GITHUB_OUTPUT
+          echo "image-latest-url=ghcr.io/example/my-app-${{ matrix.component }}:latest" >> $GITHUB_OUTPUT
           echo "image-digest-url=ghcr.io/example/my-app-${{ matrix.component }}@sha256:$(openssl rand -hex 32)" >> $GITHUB_OUTPUT
-          echo "image-created=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> $GITHUB_OUTPUT
+          echo "image-created-timestamp=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> $GITHUB_OUTPUT
 
       - name: Summarize Component Stage
         if: always()
@@ -85,6 +85,6 @@ jobs:
           stage-result: ${{ job.status }}
           stage-name: 'Component Build'
           component-name: ${{ matrix.component }}
-          image-url: ${{ steps.build.outputs.image-url }}
+          image-latest-url: ${{ steps.build.outputs.image-latest-url }}
           image-digest-url: ${{ steps.build.outputs.image-digest-url }}
-          image-created: ${{ steps.build.outputs.image-created }}
+          image-created-timestamp: ${{ steps.build.outputs.image-created-timestamp }}
