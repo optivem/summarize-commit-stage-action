@@ -2,6 +2,10 @@ name: 'Summarize Commit Stage'
 description: 'Generate a comprehensive summary of the commit stage results including build status and Docker image information'
 author: 'Optivem'
 
+branding:
+  icon: 'file-text'
+  color: 'blue'
+
 inputs:
   stage-result:
     description: 'Result of the stage job (success, failure, cancelled, etc.)'

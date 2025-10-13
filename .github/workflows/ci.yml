@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate action.yml
+        run: |
+          # Basic validation that the action.yml is valid YAML
+          python -c "import yaml; yaml.safe_load(open('action.yml'))"
+
+      - name: Test action locally
+        id: test-action
+        uses: ./
+        with:
+          stage-result: 'success'
+          component-name: 'Test Component'
+          image-url: 'ghcr.io/test/example:latest'
+          image-digest-url: 'ghcr.io/test/example@sha256:abcd1234567890abcdef1234567890abcdef1234567890abcdef1234567890ab'
+          image-created: '2025-10-13T10:30:00Z'

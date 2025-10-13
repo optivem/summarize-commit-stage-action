@@ -1,0 +1,62 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Extract version from tag
+        id: extract-version
+        run: |
+          TAG=${GITHUB_REF#refs/tags/}
+          VERSION=${TAG#v}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+
+      - name: Create Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.extract-version.outputs.tag }}
+          release_name: Release ${{ steps.extract-version.outputs.tag }}
+          body: |
+            ## Changes in ${{ steps.extract-version.outputs.tag }}
+            
+            This release includes improvements and updates to the Summarize Commit Stage Action.
+            
+            ### Usage
+            
+            ```yaml
+            - name: Summarize Commit Stage
+              uses: optivem/summarize-commit-stage-action@${{ steps.extract-version.outputs.tag }}
+              with:
+                stage-result: ${{ job.status }}
+                component-name: 'My Component'
+                image-url: ${{ steps.build.outputs.image-url }}
+                image-digest-url: ${{ steps.build.outputs.image-digest-url }}
+                image-created: ${{ steps.build.outputs.image-created }}
+            ```
+            
+            For detailed usage instructions, see the [README](https://github.com/optivem/summarize-commit-stage-action#readme).
+          draft: false
+          prerelease: false
+
+      - name: Update major version tag
+        run: |
+          TAG=${{ steps.extract-version.outputs.tag }}
+          MAJOR_VERSION=$(echo $TAG | cut -d. -f1)
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git tag -fa $MAJOR_VERSION -m "Update $MAJOR_VERSION tag"
+          git push origin $MAJOR_VERSION --force

@@ -1,0 +1,90 @@
+name: Example CI Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  commit-stage:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha
+
+      - name: Build and push Docker image
+        id: docker-build
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Summarize Commit Stage
+        if: always()  # Run even if previous steps fail
+        uses: optivem/summarize-commit-stage-action@v1
+        with:
+          stage-result: ${{ job.status }}
+          component-name: 'Example Application'
+          image-url: ${{ fromJSON(steps.docker-build.outputs.metadata)['image.name'] }}
+          image-digest-url: ${{ steps.meta.outputs.tags }}@${{ steps.docker-build.outputs.digest }}
+          image-created: ${{ fromJSON(steps.docker-build.outputs.metadata)['image.created'] }}
+
+  multi-component-example:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        component: [frontend, backend, worker]
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build component
+        id: build
+        run: |
+          # Simulate building different components
+          echo "Building ${{ matrix.component }}"
+          
+          # Mock outputs that would come from actual build steps
+          echo "image-url=ghcr.io/example/my-app-${{ matrix.component }}:latest" >> $GITHUB_OUTPUT
+          echo "image-digest-url=ghcr.io/example/my-app-${{ matrix.component }}@sha256:$(openssl rand -hex 32)" >> $GITHUB_OUTPUT
+          echo "image-created=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> $GITHUB_OUTPUT
+
+      - name: Summarize Component Stage
+        if: always()
+        uses: optivem/summarize-commit-stage-action@v1
+        with:
+          stage-result: ${{ job.status }}
+          stage-name: 'Component Build'
+          component-name: ${{ matrix.component }}
+          image-url: ${{ steps.build.outputs.image-url }}
+          image-digest-url: ${{ steps.build.outputs.image-digest-url }}
+          image-created: ${{ steps.build.outputs.image-created }}
