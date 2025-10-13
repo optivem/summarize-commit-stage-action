@@ -6,109 +6,41 @@ inputs:
   stage-result:
     description: 'Result of the stage job (success, failure, cancelled, etc.)'
     required: true
-  image-url:
-    description: 'Full URL of the pushed Docker image'
-    required: false
-    default: ''
-  image-digest-url:
-    description: 'Full URL with SHA256 digest of the pushed image'
-    required: false
-    default: ''
-  image-created:
-    description: 'Timestamp when the Docker image was created'
-    required: false
-    default: ''
   stage-name:
     description: 'Name of the stage being summarized'
     required: false
     default: 'Commit Stage'
-  success-emoji:
-    description: 'Emoji to display for successful builds'
-    required: false
-    default: '✅'
-  failure-emoji:
-    description: 'Emoji to display for failed builds'
-    required: false
-    default: '❌'
-  cancelled-emoji:
-    description: 'Emoji to display for cancelled builds'
-    required: false
-    default: '🛑'
-  unknown-emoji:
-    description: 'Emoji to display for unknown build status'
-    required: false
-    default: '⚠️'
+  component-name:
+    description: 'Name of the component being processed (e.g., Monolith, API, Frontend)'
+    required: true
+  image-url:
+    description: 'Full URL of the pushed Docker image'
+    required: true
+  image-digest-url:
+    description: 'Full URL with SHA256 digest of the pushed image'
+    required: true
+  image-created:
+    description: 'Timestamp when the Docker image was created'
+    required: true
+
 
 runs:
   using: 'composite'
   steps:
     - name: Generate Commit Stage Summary
-      shell: bash
-      run: |
-        echo "# ${{ inputs.stage-name }} Summary" >> $GITHUB_STEP_SUMMARY
-        echo "" >> $GITHUB_STEP_SUMMARY
-        
-        # Check build job result
-        BUILD_RESULT="${{ inputs.stage-result }}"
-        
-        if [[ "$BUILD_RESULT" == "success" ]]; then
-          echo "## ${{ inputs.success-emoji }} ${{ inputs.stage-name }} Succeeded" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
+      uses: optivem/summarize-stage-action@v1
+      with:
+        stage-result: ${{ inputs.stage-result }}
+        stage-name: '${{ inputs.stage-name }} - ${{ inputs.component-name }}'
+        stage-success-message: 'Successfully Published Docker Image:'
+        stage-success-content: |
+          **Image URL:**
+          `${{ inputs.image-url }}`
           
-          # Only show Docker image info if we have image outputs
-          if [[ -n "${{ inputs.image-url }}" ]]; then
-            echo "Successfully Published Docker Image:" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            
-            # Get the outputs and handle potential truncation
-            IMAGE_URL="${{ inputs.image-url }}"
-            IMAGE_DIGEST_URL="${{ inputs.image-digest-url }}"
-            IMAGE_CREATED="${{ inputs.image-created }}"
-            
-            echo "**Image URL:**" >> $GITHUB_STEP_SUMMARY
-            echo "\`$IMAGE_URL\`" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            
-            if [[ -n "$IMAGE_CREATED" ]]; then
-              echo "**Image Created:**" >> $GITHUB_STEP_SUMMARY
-              echo "\`$IMAGE_CREATED\`" >> $GITHUB_STEP_SUMMARY
-              echo "" >> $GITHUB_STEP_SUMMARY
-            fi
-            
-            if [[ -n "$IMAGE_DIGEST_URL" ]]; then
-              # Handle digest URL with better truncation detection and display
-              echo "**Image Digest URL:**" >> $GITHUB_STEP_SUMMARY
-              if [[ ${#IMAGE_DIGEST_URL} -gt 200 ]] || [[ "$IMAGE_DIGEST_URL" == *"..."* ]]; then
-                # If URL is very long or contains truncation indicator, show it in parts
-                echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-                echo "$IMAGE_DIGEST_URL" >> $GITHUB_STEP_SUMMARY
-                echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-                echo "⚠️ *Long digest URL - check 'Publish Docker Image' step logs for full details*" >> $GITHUB_STEP_SUMMARY
-              elif [[ "$IMAGE_DIGEST_URL" == *"@sha256:"* ]]; then
-                # Normal case - valid digest URL
-                echo "\`$IMAGE_DIGEST_URL\`" >> $GITHUB_STEP_SUMMARY
-              else
-                # Potentially truncated or invalid
-                echo "\`$IMAGE_DIGEST_URL\`" >> $GITHUB_STEP_SUMMARY
-                echo "⚠️ *Digest URL may be incomplete - check 'Publish Docker Image' step logs for full digest*" >> $GITHUB_STEP_SUMMARY
-              fi
-            fi
-          else
-            echo "Build completed successfully." >> $GITHUB_STEP_SUMMARY
-          fi
+          **Image Created:**
+          `${{ inputs.image-created }}`
           
-        elif [[ "$BUILD_RESULT" == "failure" ]]; then
-          echo "## ${{ inputs.failure-emoji }} ${{ inputs.stage-name }} Failed" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "The build process encountered an error. Check the job logs for details." >> $GITHUB_STEP_SUMMARY
+          **Image Digest URL:**
+          `${{ inputs.image-digest-url }}`
           
-        elif [[ "$BUILD_RESULT" == "cancelled" ]]; then
-          echo "## ${{ inputs.cancelled-emoji }} ${{ inputs.stage-name }} Cancelled" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "⏹️ **Build process was cancelled**" >> $GITHUB_STEP_SUMMARY
-          
-        else
-          echo "## ${{ inputs.unknown-emoji }} ${{ inputs.stage-name }} Status Unknown" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "❓ **Build result:** \`$BUILD_RESULT\`" >> $GITHUB_STEP_SUMMARY
-        fi
+          ⚠️ *If digest URL appears truncated, check 'Publish Docker Image' step logs for full details*
