@@ -38,12 +38,12 @@ jobs:
         with:
           stage-result: ${{ job.status }}
           component-name: 'My Application'
-          image-latest-url: ${{ steps.docker-build.outputs.image-url }}
-          image-digest-url: ${{ steps.docker-build.outputs.image-digest-url }}
-          image-created-timestamp: ${{ steps.docker-build.outputs.image-created }}
+          artifact-url: ${{ steps.docker-build.outputs.image-url }}
+          artifact-created-timestamp: ${{ steps.docker-build.outputs.image-created }}
+          artifact-type: 'Docker Image'
 ```
 
-### Advanced Example with Custom Stage Name
+### Docker Image Example
 
 ```yaml
       - name: Summarize API Commit Stage
@@ -52,9 +52,35 @@ jobs:
           stage-result: ${{ job.status }}
           stage-name: 'API Build & Deploy'
           component-name: 'Backend API'
-          image-latest-url: 'my-registry.com/my-app:latest'
-          image-digest-url: 'my-registry.com/my-app@sha256:abc123...'
-          image-created-timestamp: '2025-10-13T10:30:00Z'
+          artifact-url: 'my-registry.com/my-app:latest'
+          artifact-created-timestamp: '2025-10-13T10:30:00Z'
+          artifact-type: 'Docker Image'
+```
+
+### Installer/MSI Example
+
+```yaml
+      - name: Summarize Windows Build
+        uses: optivem/summarize-commit-stage-action@v1
+        with:
+          stage-result: ${{ job.status }}
+          component-name: 'Desktop Application'
+          artifact-url: 'https://releases.example.com/v1.0.0/MyApp-Setup.msi'
+          artifact-created-timestamp: '2025-10-13T10:30:00Z'
+          artifact-type: 'MSI Installer'
+```
+
+### NPM Package Example
+
+```yaml
+      - name: Summarize NPM Publish
+        uses: optivem/summarize-commit-stage-action@v1
+        with:
+          stage-result: ${{ job.status }}
+          component-name: 'UI Components'
+          artifact-url: 'https://www.npmjs.com/package/my-components'
+          artifact-created-timestamp: '2025-10-13T10:30:00Z'
+          artifact-type: 'NPM Package'
 ```
 
 ## Inputs
@@ -64,9 +90,9 @@ jobs:
 | `stage-result` | Result of the stage job (success, failure, cancelled, etc.) | ✅ Yes | |
 | `stage-name` | Name of the stage being summarized | ❌ No | `Commit Stage` |
 | `component-name` | Name of the component being processed (e.g., Monolith, API, Frontend) | ✅ Yes | |
-| `image-latest-url` | Full URL of the pushed Docker image | ✅ Yes | |
-| `image-digest-url` | Full URL with SHA256 digest of the pushed image | ✅ Yes | |
-| `image-created-timestamp` | Timestamp when the Docker image was created (ISO 8601 format) | ✅ Yes | |
+| `artifact-url` | URL of the published artifact (Docker image, installer, package, etc.) | ✅ Yes | |
+| `artifact-created-timestamp` | Timestamp when the artifact was created (ISO 8601 format) | ✅ Yes | |
+| `artifact-type` | Type of artifact for display purposes | ❌ No | `Artifact` |
 
 ## Output
 
@@ -74,11 +100,10 @@ This action generates a formatted summary that includes:
 
 - **Stage Status**: Clear indication of success/failure
 - **Component Information**: The component name being processed
-- **Docker Image Details**:
-  - Image URL for easy access
+- **Artifact Details**:
+  - Artifact URL for easy access
   - Creation timestamp
-  - SHA256 digest URL for verification
-  - Helpful note about potential digest URL truncation
+  - Artifact type for context
 
 ## Example Output
 
@@ -89,16 +114,11 @@ When successful, the action generates a summary like:
 
 Successfully Published Docker Image:
 
-**Image URL:**
+**Artifact URL:**
 `my-registry.com/my-app:latest`
 
-**Image Created:**
+**Created:**
 `2025-10-13T10:30:00Z`
-
-**Image Digest URL:**
-`my-registry.com/my-app@sha256:abc123...`
-
-⚠️ *If digest URL appears truncated, check 'Publish Docker Image' step logs for full details*
 ```
 
 ## Dependencies

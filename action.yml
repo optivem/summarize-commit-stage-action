@@ -17,15 +17,16 @@ inputs:
   component-name:
     description: 'Name of the component being processed (e.g., Monolith, API, Frontend)'
     required: true
-  image-latest-url:
-    description: 'Full URL of the pushed Docker image'
+  artifact-url:
+    description: 'URL of the published artifact (e.g., Docker image, installer, package)'
     required: true
-  image-digest-url:
-    description: 'Full URL with SHA256 digest of the pushed image'
+  artifact-created-timestamp:
+    description: 'Timestamp when the artifact was created'
     required: true
-  image-created-timestamp:
-    description: 'Timestamp when the Docker image was created'
-    required: true
+  artifact-type:
+    description: 'Type of artifact (e.g., Docker Image, Installer, JAR, NPM Package)'
+    required: false
+    default: 'Artifact'
 
 
 runs:
@@ -36,15 +37,10 @@ runs:
       with:
         stage-result: ${{ inputs.stage-result }}
         stage-name: '${{ inputs.stage-name }} - ${{ inputs.component-name }}'
-        stage-success-message: 'Successfully Published Docker Image:'
+        stage-success-message: 'Successfully Published ${{ inputs.artifact-type }}:'
         stage-success-content: |
-          **Image URL:**
-          `${{ inputs.image-latest-url }}`
+          **Artifact URL:**
+          `${{ inputs.artifact-url }}`
           
-          **Image Created:**
-          `${{ inputs.image-created-timestamp }}`
-          
-          **Image Digest URL:**
-          `${{ inputs.image-digest-url }}`
-          
-          ⚠️ *If digest URL appears truncated, check 'Publish Docker Image' step logs for full details*
+          **Created:**
+          `${{ inputs.artifact-created-timestamp }}`

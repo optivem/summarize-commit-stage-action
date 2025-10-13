@@ -64,9 +64,9 @@ git push origin main
      with:
        stage-result: ${{ job.status }}
        component-name: 'My Component'
-       image-latest-url: ${{ steps.build.outputs.image-url }}
-       image-digest-url: ${{ steps.build.outputs.image-digest-url }}
-       image-created-timestamp: ${{ steps.build.outputs.image-created }}
+       artifact-url: ${{ steps.build.outputs.artifact-url }}
+       artifact-created-timestamp: ${{ steps.build.outputs.artifact-created }}
+       artifact-type: 'Docker Image'
    ```
    
    For detailed documentation, see the [README](https://github.com/optivem/summarize-commit-stage-action#readme).

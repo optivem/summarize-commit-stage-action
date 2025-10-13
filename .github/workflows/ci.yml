@@ -25,6 +25,6 @@ jobs:
         with:
           stage-result: 'success'
           component-name: 'Test Component'
-          image-latest-url: 'ghcr.io/test/example:latest'
-          image-digest-url: 'ghcr.io/test/example@sha256:abcd1234567890abcdef1234567890abcdef1234567890abcdef1234567890ab'
-          image-created-timestamp: '2025-10-13T10:30:00Z'
+          artifact-url: 'ghcr.io/test/example:latest'
+          artifact-created-timestamp: '2025-10-13T10:30:00Z'
+          artifact-type: 'Docker Image'
