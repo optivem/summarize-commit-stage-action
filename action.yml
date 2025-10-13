@@ -20,13 +20,14 @@ inputs:
   artifact-url:
     description: 'URL of the published artifact (e.g., Docker image, installer, package)'
     required: true
-  artifact-created-timestamp:
-    description: 'Timestamp when the artifact was created'
-    required: true
   artifact-type:
     description: 'Type of artifact (e.g., Docker Image, Installer, JAR, NPM Package)'
     required: false
-    default: 'Artifact'
+    default: 'Docker Image'
+  artifact-created-timestamp:
+    description: 'Timestamp when the artifact was created'
+    required: true
+
 
 
 runs:
@@ -39,6 +40,9 @@ runs:
         stage-name: '${{ inputs.stage-name }} - ${{ inputs.component-name }}'
         stage-success-message: 'Successfully Published ${{ inputs.artifact-type }}:'
         stage-success-content: |
+          **Artifact Type:**
+          `${{ inputs.artifact-type }}`
+          
           **Artifact URL:**
           `${{ inputs.artifact-url }}`
           
