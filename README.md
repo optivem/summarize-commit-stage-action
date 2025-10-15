@@ -44,7 +44,6 @@ jobs:
           component-name: 'My Application'
           artifact-url: ${{ steps.docker-build.outputs.image-url }}
           artifact-created-timestamp: ${{ steps.docker-build.outputs.image-created }}
-          artifact-type: 'Docker Image'
 ```
 
 ### Docker Image Example
