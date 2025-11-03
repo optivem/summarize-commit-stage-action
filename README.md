@@ -5,6 +5,7 @@
 [![Release](https://github.com/optivem/summarize-commit-stage-action/actions/workflows/release.yml/badge.svg)](https://github.com/optivem/summarize-commit-stage-action/actions/workflows/release.yml)
 
 [![GitHub release](https://img.shields.io/github/release/optivem/summarize-commit-stage-action.svg)](https://github.com/optivem/summarize-commit-stage-action/releases)
+[![GitHub](https://img.shields.io/github/license/optivem/summarize-commit-stage-action)](LICENSE)
 
 A GitHub Action that generates comprehensive summaries of commit stage results, including build status and Docker image information. This action is particularly useful for CI/CD pipelines where you want to provide clear, formatted summaries of your commit stage outcomes.
 
