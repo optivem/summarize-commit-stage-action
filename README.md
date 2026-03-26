@@ -1,3 +1,6 @@
+> [!WARNING]
+> This action has moved to [optivem/actions](https://github.com/optivem/actions). Use `optivem/actions/summarize-commit-stage@v1` instead.
+
 # Summarize Commit Stage Action
 
 [![CI](https://github.com/optivem/summarize-commit-stage-action/actions/workflows/ci.yml/badge.svg)](https://github.com/optivem/summarize-commit-stage-action/actions/workflows/ci.yml)
